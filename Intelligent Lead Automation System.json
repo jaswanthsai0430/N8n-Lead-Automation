@@ -1,0 +1,615 @@
+{
+  "name": "Intelligent Lead Automation System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "options": {}
+      },
+      "id": "75df230b-71b2-445f-8259-2bd0d9afcdde",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        1920
+      ],
+      "webhookId": "54d80b0c-1703-4fdb-8d99-f119cf9b01fb"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "trigger_action",
+              "value": "={{$json.body.trigger_action}}"
+            },
+            {
+              "name": "name",
+              "value": "={{$json.body.name}}"
+            },
+            {
+              "name": "phone",
+              "value": "={{$json.body.phone}}"
+            },
+            {
+              "name": "email",
+              "value": "={{$json.body.email}}"
+            },
+            {
+              "name": "interest",
+              "value": "={{$json.body.interest}}"
+            },
+            {
+              "name": "status",
+              "value": "={{$json.body.status}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4b896e24-6ec1-4e98-bf3b-a495cd725005",
+      "name": "Format Data (Set)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        1920
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $('Format Data (Set)').item.json.interest }}",
+              "value2": "High"
+            }
+          ]
+        }
+      },
+      "id": "859cd8c1-7c94-4f55-b657-5982ceb2f033",
+      "name": "Check High Interest",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        800,
+        1904
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Format Data (Set)').item.json.name }}"
+            },
+            {
+              "name": "status",
+              "value": "Hot Lead Pipeline"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "71dd9b93-e6a5-44aa-bf20-7b216a6f081c",
+      "name": "Update CRM - High",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1072,
+        1744
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "deal_name",
+              "value": "={{ $('Format Data (Set)').item.json.name }} Opportunity"
+            },
+            {
+              "name": "source",
+              "value": "Nexus Automation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "605cb373-bb52-4388-a5d1-4369715fb221",
+      "name": "Sync ERP Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1312,
+        1744
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Format Data (Set)').item.json.email }}",
+        "subject": "Priority Update Regarding Your Inquiry",
+        "message": "=Dear Customer,\n\n{{ $node[\"Basic LLM Chain\"].json.text }}\n\nThank you for choosing Nexus CRM.",
+        "options": {}
+      },
+      "id": "641bfa16-5fd0-4996-bf95-c45ba6eb7bbe",
+      "name": "Send Real-Time Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        1744
+      ],
+      "webhookId": "7355bb0f-e83b-4825-bffc-6beb45452a41",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "5dJfLUlksyf3Ys47",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $('Format Data (Set)').item.json.interest }}",
+              "value2": "Medium"
+            }
+          ]
+        }
+      },
+      "id": "eea56a54-c041-421e-96c9-fe83294af0b0",
+      "name": "Check Medium Interest",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "to",
+              "value": "={{ $('Format Data (Set)').item.json.email }}"
+            },
+            {
+              "name": "message",
+              "value": "=Dear Customer, {{ $node[\"Basic LLM Chain\"].json.text }} Thank you for your interest."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "74898aed-7909-49b3-be4d-acc73165b31e",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1312,
+        1952
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "campaign",
+              "value": "Cold Lead"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3bc1e9bc-4a0b-48f3-8f28-8e742e436585",
+      "name": "Add to Campaign",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        2160
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this lead data: Action: {{ $('Format Data (Set)').item.json.trigger_action }}, Name: {{ $('Format Data (Set)').item.json.name }}, Interest: {{ $('Format Data (Set)').item.json.interest }}. Task: Draft a highly personalized 1-sentence message.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        480,
+        1904
+      ],
+      "id": "2a0cbd60-cb4f-4462-81c9-80d1bdc8173d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        480,
+        2128
+      ],
+      "id": "29127182-80e1-435a-921e-8d29615fed65",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "lvcWIyyUH5nn5WvH",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Format Data (Set)').item.json.trigger_action }}",
+                    "rightValue": "new_lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9f677a8b-27b8-4c80-92c2-474604843c07"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New Lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2b35cc37-e53a-45ff-99b3-c80802fba581",
+                    "leftValue": "={{ $('Format Data (Set)').item.json.trigger_action }}",
+                    "rightValue": "status_update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Status Update"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        1920
+      ],
+      "id": "2163d64b-757b-43dc-b747-4f45dace5c6d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1AsUmDgy7nc2Pz_M1R3svxC2JjajPouLVzfIv4qfm40A",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AsUmDgy7nc2Pz_M1R3svxC2JjajPouLVzfIv4qfm40A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Format Data (Set)').item.json.name }}",
+            "Phone": "={{ $('Format Data (Set)').item.json.phone }}",
+            "Email": "={{ $('Format Data (Set)').item.json.email }}",
+            "Status": "={{ $('Format Data (Set)').item.json.status }}",
+            "Interest": "={{ $('Format Data (Set)').item.json.interest }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Interest",
+              "displayName": "Interest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        1920
+      ],
+      "id": "84eaa69b-47b4-4021-8302-41f0a3693600",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7YpzfZERttQUX13Z",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "primary-production-c389.up.railway.app",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+            "content-length": "148",
+            "accept": "application/json",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9",
+            "content-type": "application/json",
+            "origin": "http://127.0.0.1:5500",
+            "priority": "u=1, i",
+            "referer": "http://127.0.0.1:5500/",
+            "sec-ch-ua": "\"Chromium\";v=\"146\", \"Not-A.Brand\";v=\"24\", \"Google Chrome\";v=\"146\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "49.47.249.255",
+            "x-forwarded-host": "primary-production-c389.up.railway.app",
+            "x-forwarded-proto": "https",
+            "x-railway-edge": "railway/asia-southeast1-eqsg3a",
+            "x-railway-request-id": "k7ngRWMRSbu14mZeVOLIQQ",
+            "x-real-ip": "49.47.249.255",
+            "x-request-start": "1774246345992"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "trigger_action": "new_lead",
+            "name": "jaswanth sai ram",
+            "phone": "+918106169173",
+            "email": "jaswanthsai0430@gmail.com",
+            "status": "New",
+            "interest": "High"
+          },
+          "webhookUrl": "https://primary-production-c389.up.railway.app/webhook-test/lead",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Data (Set)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data (Set)": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check High Interest": {
+      "main": [
+        [
+          {
+            "node": "Update CRM - High",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Medium Interest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CRM - High": {
+      "main": [
+        [
+          {
+            "node": "Sync ERP Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sync ERP Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Send Real-Time Email (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Medium Interest": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Check High Interest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5a9c9cfd-640f-46b4-a977-51fc651cb903",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d258bcfd6f09fa03e49e8029ea7e17846bf35559d8e68da31678885a5e67cfcb"
+  },
+  "id": "byH6vKygLyA6Y6VY",
+  "tags": []
+}

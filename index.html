@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Intelligent Lead Automation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Nexus Automation</div>
+            <div class="status-indicator">
+                <div class="dot"></div>
+                <span>System Operational</span>
+            </div>
+        </header>
+
+        <main class="main-grid">
+            <!-- Lead Intake Section -->
+            <section class="card lead-section">
+                <h2>New Lead Intake</h2>
+                <form id="leadForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required>
+                    </div>
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="interest">Interest Level</label>
+                            <select id="interest" name="interest" required>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Lead Status</label>
+                            <select id="status" name="status" required>
+                                <option value="New">New</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Qualified">Qualified</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" name="trigger_action" value="new_lead">
+                    <button type="submit" class="btn-primary" id="submitBtn">Generate Intelligent Response</button>
+                </form>
+            </section>
+
+            <!-- Dashboard / Status Section -->
+            <section class="card dashboard-section">
+                <div class="dashboard-header">
+                    <h2>Recent Automation Activity</h2>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button id="syncBtn" class="badge" style="background: var(--primary); color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;">
+                            <span>Sync All Leads</span>
+                        </button>
+                        <span id="activityCount" class="badge" style="background: var(--border);">0 Leads</span>
+                    </div>
+                </div>
+                
+                <div id="leadList" class="lead-list">
+                    <div class="empty-state">No recent activity. Submit a lead to start automation.</div>
+                </div>
+
+                <!-- LLM Preview Area (Hidden by default) -->
+                <div id="llmPreview" class="card" style="margin-top: 2rem; background: #fdfcfe; display: none; border-style: dashed; border-color: var(--primary-light);">
+                    <h3 style="font-size: 0.875rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">AI Draft Generation</h3>
+                    <p id="llmText" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main); font-style: italic;">Processing lead data with LLM...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
