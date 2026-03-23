@@ -1,8 +1,8 @@
 # N8n-Lead-Automation
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR_SITE_ID/deploy-status)](https://app.netlify.com/projects/n8n-lead-automation/configuration/general)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR_SITE_ID/deploy-status)](https://n8n-lead-automation.netlify.app/)
 
-**🔗 [View Live Project](https://app.netlify.com/projects/n8n-lead-automation/configuration/general)**
+**🔗 [View Live Project](https://n8n-lead-automation.netlify.app/)**
 
 ---
 
@@ -11,12 +11,6 @@ A powerful automation workflow for lead management and nurturing built with N8n.
 ## 🎯 Overview
 
 N8n-Lead-Automation is designed to help businesses automate their lead management processes. It integrates multiple services to create a seamless workflow for capturing, processing, and managing leads efficiently.
-
-## 💻 Tech Stack
-
-- **JavaScript** (42.7%) - Primary language for workflow logic
-- **CSS** (30.4%) - Frontend styling
-- **HTML** (26.9%) - Frontend markup
 
 ## ✨ Features
 
@@ -29,11 +23,6 @@ N8n-Lead-Automation is designed to help businesses automate their lead managemen
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js (v14 or higher)
-- N8n installed and configured
-- API keys for integrated services (as required)
 
 ### Installation
 
