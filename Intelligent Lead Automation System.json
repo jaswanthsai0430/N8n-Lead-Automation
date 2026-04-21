@@ -1,0 +1,705 @@
+{
+  "name": "Intelligent Lead Automation System",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "options": {}
+      },
+      "id": "1591894f-49d9-432a-93b3-949e5e998c14",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1520,
+        176
+      ],
+      "webhookId": "54d80b0c-1703-4fdb-8d99-f119cf9b01fb"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "trigger_action",
+              "value": "={{$json.body.trigger_action}}"
+            },
+            {
+              "name": "name",
+              "value": "={{$json.body.name}}"
+            },
+            {
+              "name": "phone",
+              "value": "={{$json.body.phone}}"
+            },
+            {
+              "name": "email",
+              "value": "={{$json.body.email}}"
+            },
+            {
+              "name": "interest",
+              "value": "={{$json.body.interest}}"
+            },
+            {
+              "name": "status",
+              "value": "={{$json.body.status}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "23fbe079-dd93-46d8-82fe-792c205d4d49",
+      "name": "Format Data (Set)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $('Format Data (Set)').item.json.interest }}",
+              "value2": "High"
+            }
+          ]
+        }
+      },
+      "id": "56d726c0-3217-49c3-83c8-f1af0392cba3",
+      "name": "Check High Interest",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Format Data (Set)').item.json.name }}"
+            },
+            {
+              "name": "status",
+              "value": "Hot Lead Pipeline"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d107a9bc-dd6e-4e62-a3b9-c5dd12c02921",
+      "name": "Update CRM - High",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "deal_name",
+              "value": "={{ $('Format Data (Set)').item.json.name }} Opportunity"
+            },
+            {
+              "name": "source",
+              "value": "Nexus Automation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5a890d53-8971-4c5c-be0b-4201d9e48d07",
+      "name": "Sync ERP Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Format Data (Set)').item.json.email }}",
+        "subject": "Priority Update Regarding Your Inquiry",
+        "message": "=Dear Customer,\n\n{{ $node[\"Basic LLM Chain\"].json.text }}\n\nThank you for choosing Nexus CRM.",
+        "options": {}
+      },
+      "id": "54448d57-a7ec-49da-8551-d2f9199c8e74",
+      "name": "Send Real-Time Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "webhookId": "7355bb0f-e83b-4825-bffc-6beb45452a41",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "4ytAiAo5BqjtQBoJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $('Format Data (Set)').item.json.interest }}",
+              "value2": "Medium"
+            }
+          ]
+        }
+      },
+      "id": "94fe4a34-1cf6-4060-830b-50686bd0d970",
+      "name": "Check Medium Interest",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        16,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "campaign",
+              "value": "Cold Lead"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c47854d1-2787-4063-9ed8-f6ec91c4a653",
+      "name": "Add to Campaign",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        240,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following lead data carefully and generate a highly personalized, engaging, and professional message tailored specifically to the lead.\n\nLead Details:\n- Action Type: {{ $('Format Data (Set)').item.json.trigger_action }}\n- Name: {{ $('Format Data (Set)').item.json.name }}\n- Interest Level: {{ $('Format Data (Set)').item.json.interest }}\n\nInstructions:\n- Address the lead by their name.\n- Adapt tone based on interest level:\n  • High → enthusiastic, priority-focused, urgent tone  \n  • Medium → friendly, informative, nurturing tone  \n  • Low → polite, soft marketing tone  \n- If action is \"new_lead\", welcome them and acknowledge their interest.\n- If action is \"status_update\", acknowledge their previous interaction.\n- Highlight value or benefits relevant to their interest.\n- Keep the message concise but impactful (2–3 sentences max).\n- Make it sound natural, human, and not robotic.\n- End with a subtle call-to-action (reply, explore, or connect).\n\nOutput:\nGenerate only the final message without any explanation.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -592,
+        160
+      ],
+      "id": "67b611bb-e30d-48b3-920f-49d7c2b57151",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        384
+      ],
+      "id": "191bb39c-0765-4d8d-9e15-12ed1e2fa8a0",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "5caiBxBfCaSCfgeF",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Format Data (Set)').item.json.trigger_action }}",
+                    "rightValue": "new_lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9f677a8b-27b8-4c80-92c2-474604843c07"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New Lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2b35cc37-e53a-45ff-99b3-c80802fba581",
+                    "leftValue": "={{ $('Format Data (Set)').item.json.trigger_action }}",
+                    "rightValue": "status_update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Status Update"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -832,
+        176
+      ],
+      "id": "0be3420b-4608-4fe8-82eb-e33b09aa879f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1AsUmDgy7nc2Pz_M1R3svxC2JjajPouLVzfIv4qfm40A",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AsUmDgy7nc2Pz_M1R3svxC2JjajPouLVzfIv4qfm40A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Format Data (Set)').item.json.name }}",
+            "Phone": "={{ $('Format Data (Set)').item.json.phone }}",
+            "Email": "={{ $('Format Data (Set)').item.json.email }}",
+            "Status": "={{ $('Format Data (Set)').item.json.status }}",
+            "Interest": "={{ $('Format Data (Set)').item.json.interest }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Interest",
+              "displayName": "Interest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1024,
+        176
+      ],
+      "id": "0add41ac-bc85-4dc8-bc2f-a0c2aaa00754",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ulyBzDCisNEbD1GP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1AsUmDgy7nc2Pz_M1R3svxC2JjajPouLVzfIv4qfm40A",
+          "mode": "list",
+          "cachedResultName": "Lead Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AsUmDgy7nc2Pz_M1R3svxC2JjajPouLVzfIv4qfm40A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 194300604,
+          "mode": "list",
+          "cachedResultName": "Low status",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AsUmDgy7nc2Pz_M1R3svxC2JjajPouLVzfIv4qfm40A/edit#gid=194300604"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Append or update row in sheet').item.json.Name }}",
+            "Phone": "={{ $('Append or update row in sheet').item.json.Phone }}",
+            "Email": "={{ $('Append or update row in sheet').item.json.Email }}",
+            "Interest": "={{ $('Append or update row in sheet').item.json.Interest }}",
+            "Status": "={{ $('Append or update row in sheet').item.json.Status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interest",
+              "displayName": "Interest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        416
+      ],
+      "id": "accf41cf-2fa8-4642-895f-6f029972c464",
+      "name": "campaign data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ulyBzDCisNEbD1GP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Update Regarding Your Inquiry",
+        "message": "=Dear Customer, \n\n{{ $node[\"Basic LLM Chain\"].json.text }} \n\nThank you for choosing Nexus CRM.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        576
+      ],
+      "id": "05cde494-c516-4bc9-bf03-f6732791947a",
+      "name": "Send a message",
+      "webhookId": "53cfb37b-0a16-4d0a-9ae4-0a7f26ed664e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "4ytAiAo5BqjtQBoJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "Update Regarding Your Inquiry",
+        "message": "=Dear Customer,  \n\n{{ $node[\"Basic LLM Chain\"].json.text }} \n\nThank you for choosing Nexus CRM.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        192
+      ],
+      "id": "1b9f934b-88f9-4424-a74d-0cf4476f737e",
+      "name": "Send a message1",
+      "webhookId": "805e42bf-734a-49e8-953c-8959dd098702",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "4ytAiAo5BqjtQBoJ",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Data (Set)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data (Set)": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check High Interest": {
+      "main": [
+        [
+          {
+            "node": "Update CRM - High",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Medium Interest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CRM - High": {
+      "main": [
+        [
+          {
+            "node": "Sync ERP Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sync ERP Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Send Real-Time Email (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Medium Interest": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Check High Interest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Campaign": {
+      "main": [
+        [
+          {
+            "node": "campaign data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "campaign data": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4e938cd8-6938-4f04-a24c-f0a653ea7800",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab1c2ec53d4883cd289b7320f0bf3104280ba7976afb80894bdd017357fb014c"
+  },
+  "id": "RZSMwYpGdYmTPyTF",
+  "tags": []
+}
