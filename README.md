@@ -23,31 +23,6 @@ N8n-Lead-Automation is designed to help businesses automate their lead managemen
 
 ## 🚀 Getting Started
 
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/jaswanthsai0430/N8n-Lead-Automation.git
-   cd N8n-Lead-Automation
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Configure environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. Start the workflow:
-   ```bash
-   npm start
-   ```
-
 ## 📋 Configuration
 
 Configure your N8n workflows by updating the following in your environment:
